@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #6366f1;
+  --brand-2: #a855f7;
+  --ink: #0f172a;
+}
+
+html.dark {
+  --ink: #e2e8f0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-800 antialiased dark:bg-zinc-950 dark:text-zinc-200;
+  font-feature-settings: "ss01";
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ---------- مكونات عامة ---------- */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn text-white shadow-soft;
+    background-image: linear-gradient(135deg, var(--brand), var(--brand-2));
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    @apply btn border border-zinc-200 bg-white text-zinc-700 hover:border-[var(--brand)] hover:text-[var(--brand)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:text-white;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+  .card {
+    @apply rounded-2xl border border-zinc-200/80 bg-white shadow-card transition-all duration-200 dark:border-zinc-800 dark:bg-zinc-900;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors;
+    background: color-mix(in srgb, var(--brand) 10%, transparent);
+    color: var(--brand);
+  }
+  .chip:hover {
+    background: color-mix(in srgb, var(--brand) 18%, transparent);
+  }
+  .input {
+    @apply w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-800 outline-none transition-all placeholder:text-zinc-400 focus:border-[var(--brand)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand)_20%,transparent)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300;
+  }
+  .section-title {
+    @apply relative inline-block text-2xl font-extrabold text-zinc-900 dark:text-white;
+  }
+  .section-title::after {
+    content: "";
+    @apply absolute -bottom-2 right-0 h-1 w-12 rounded-full;
+    background-image: linear-gradient(90deg, var(--brand), var(--brand-2));
+  }
+  .gradient-text {
+    background-image: linear-gradient(120deg, var(--brand), var(--brand-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-mesh {
+    background:
+      radial-gradient(60% 80% at 85% 10%, color-mix(in srgb, var(--brand-2) 22%, transparent) 0%, transparent 60%),
+      radial-gradient(50% 70% at 10% 20%, color-mix(in srgb, var(--brand) 18%, transparent) 0%, transparent 55%),
+      radial-gradient(40% 50% at 50% 100%, color-mix(in srgb, var(--brand-2) 12%, transparent) 0%, transparent 60%);
+  }
+  .ad-slot {
+    @apply my-6 w-full overflow-hidden rounded-2xl border border-dashed border-zinc-200 bg-zinc-100/60 text-center dark:border-zinc-800 dark:bg-zinc-900/60;
+  }
+}
+
+/* ---------- حركات الظهور عند التمرير ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------- محتوى المقال (تنسيق القراءة) ---------- */
+.prose-ar {
+  @apply text-zinc-800 dark:text-zinc-300;
+  font-size: 1.0625rem;
+  line-height: 2;
+  word-break: break-word;
+}
+.prose-ar h1,
+.prose-ar h2,
+.prose-ar h3,
+.prose-ar h4 {
+  @apply mt-10 mb-4 font-extrabold text-zinc-900 dark:text-white;
+  line-height: 1.5;
+}
+.prose-ar h2 { @apply text-2xl; }
+.prose-ar h3 { @apply text-xl; }
+.prose-ar p { @apply my-4; }
+.prose-ar a {
+  @apply font-semibold underline decoration-2 underline-offset-4 transition-colors;
+  color: var(--brand);
+  text-decoration-color: color-mix(in srgb, var(--brand) 40%, transparent);
+}
+.prose-ar a:hover { text-decoration-color: var(--brand); }
+.prose-ar ul, .prose-ar ol { @apply my-5 space-y-2 pr-6; }
+.prose-ar ul { @apply list-disc; }
+.prose-ar ol { @apply list-decimal; }
+.prose-ar li::marker { color: var(--brand); }
+.prose-ar blockquote {
+  @apply my-6 rounded-r-2xl border-r-4 bg-zinc-100/80 px-5 py-4 text-zinc-700 italic dark:bg-zinc-800/60 dark:text-zinc-300;
+  border-color: var(--brand);
+}
+.prose-ar blockquote p { @apply my-1; }
+.prose-ar img {
+  @apply mx-auto my-6 max-w-full rounded-2xl shadow-soft;
+}
+.prose-ar pre {
+  @apply my-6 overflow-x-auto rounded-2xl bg-zinc-900 p-5 text-left text-sm leading-relaxed text-zinc-100 dark:bg-black;
+}
+.prose-ar code {
+  @apply rounded-lg bg-zinc-100 px-1.5 py-0.5 text-[0.9em] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200;
+  direction: ltr;
+  unicode-bidi: embed;
+}
+.prose-ar pre code { @apply bg-transparent p-0 text-zinc-100; }
+.prose-ar iframe {
+  @apply my-6 h-auto w-full rounded-2xl shadow-soft;
+  aspect-ratio: 16 / 9;
+}
+.prose-ar hr { @apply my-8 border-zinc-200 dark:border-zinc-800; }
+.prose-ar table { @apply my-6 w-full border-collapse text-sm; }
+.prose-ar th, .prose-ar td { @apply border border-zinc-200 px-3 py-2 dark:border-zinc-700; }
+.prose-ar th { @apply bg-zinc-100 font-bold dark:bg-zinc-800; }
+
+/* ---------- محرر Quill ---------- */
+.ql-toolbar.ql-snow {
+  @apply rounded-t-xl border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900;
+  direction: ltr;
+}
+.ql-container.ql-snow {
+  @apply rounded-b-xl border border-zinc-300 bg-white text-base dark:border-zinc-700 dark:bg-zinc-900;
+}
+.ql-editor {
+  @apply min-h-[350px] leading-8;
+  direction: rtl;
+  text-align: right;
+}
+.ql-editor img { max-width: 100%; border-radius: 12px; }
+.ql-editor.ql-blank::before {
+  @apply text-zinc-400;
+  right: 0 !important;
+  left: auto !important;
+}
+.ql-snow .ql-stroke { stroke: #52525b; }
+.ql-snow .ql-fill { fill: #52525b; }
+html.dark .ql-snow .ql-stroke { stroke: #a1a1aa; }
+html.dark .ql-snow .ql-fill { fill: #a1a1aa; }
+html.dark .ql-snow.ql-toolbar button:hover .ql-stroke,
+html.dark .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #fff; }
+html.dark .ql-snow.ql-toolbar button:hover .ql-fill,
+html.dark .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: #fff; }
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--brand); }
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill { fill: var(--brand); }
+
+/* شريط تمرير أنيق */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--brand) 35%, #a1a1aa);
+  border-radius: 8px;
+}
+
+/* شريط تقدم القراءة */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background-image: linear-gradient(90deg, var(--brand-2), var(--brand));
+  transition: width 0.1s linear;
+}
