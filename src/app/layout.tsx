@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getSetting } from "@/lib/settings";
+import { renderHeadCode } from "@/lib/headCode";
 
 export const metadata: Metadata = {
   title: {
@@ -13,7 +15,13 @@ export const metadata: Metadata = {
 
 const themeInit = `(function(){try{var t=localStorage.getItem('asba-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // كود <head> المخصص — أكواد التحقق من ملكية النطاق وشبكات الإعلانات (من لوحة التحكم)
+  let headCode = "";
+  try {
+    headCode = (await getSetting("head_code")) || "";
+  } catch {}
+
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
@@ -24,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        {renderHeadCode(headCode)}
       </head>
       <body>{children}</body>
     </html>

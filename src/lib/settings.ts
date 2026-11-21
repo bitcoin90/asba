@@ -18,6 +18,7 @@ export interface SiteSettings {
   social_telegram: string;
   social_github: string;
   social_linkedin: string;
+  head_code: string;
   [key: string]: string;
 }
 
@@ -38,6 +39,7 @@ export const SETTINGS_KEYS = [
   "social_telegram",
   "social_github",
   "social_linkedin",
+  "head_code",
 ];
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -59,6 +61,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   social_telegram: "",
   social_github: "",
   social_linkedin: "",
+  head_code: "",
 };
 
 export async function getSettings(): Promise<SiteSettings> {
