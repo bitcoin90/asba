@@ -155,3 +155,7 @@ npm run dev      # التطوير
 npm run build    # بناء الإنتاج
 npm start        # تشغيل نسخة الإنتاج
 ```
+
+## النشر
+
+الموقع يعمل على Vercel: https://asba.pw — قاعدة البيانات Turso، لوحة التحكم `/admin`.
