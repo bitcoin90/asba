@@ -35,7 +35,7 @@
 |---|---|
 | الواجهة والخادم | Next.js 15 (App Router) + React 19 + TypeScript |
 | التنسيق | Tailwind CSS 3 + متغيرات CSS للهوية اللونية |
-| قاعدة البيانات | Postgres في الإنتاج (Neon / Vercel Postgres) — SQLite للتطوير المحلي تلقائيًا |
+| قاعدة البيانات | Turso (libSQL) في الإنتاج — Postgres اختياري — SQLite للتطوير المحلي تلقائيًا |
 | المحرر | Quill 2 |
 | المصادقة | جلسة موقعة HMAC في كوكي HttpOnly + scrypt لكلمة المرور |
 | الصور | تخزين في قاعدة البيانات وتقديم عبر `/api/media/[id]` مع تخزين مؤقت |
@@ -61,9 +61,9 @@ npm run dev
 
 ## النشر على Vercel (خطوة بخطوة)
 
-### 1) إنشاء قاعدة البيانات (مجاني)
-- سجّل في [neon.tech](https://neon.tech) (أو استخدم Vercel Postgres / Supabase).
-- أنشئ مشروعًا جديدًا وانسخ **Connection String** (يفضّل النسخة Pooled).
+### 1) قاعدة البيانات (مربوطة بالفعل)
+- القاعدة جاهزة: **Turso** — `libsql://asba-asba.aws-sa-east-1.turso.io` مع توكن القراءة/الكتابة (انظر قسم «قاعدة البيانات — Turso» أدناه).
+- لا حاجة لإنشاء قاعدة جديدة؛ فقط استخدم متغيري `LIBSQL_URL` و`LIBSQL_AUTH_TOKEN` في Vercel.
 
 ### 2) الاستيراد في Vercel
 - [vercel.com/new](https://vercel.com/new) → اختر مستودع `asba` → Vercel يكتشف Next.js تلقائيًا.
@@ -71,7 +71,8 @@ npm run dev
 
 | المتغير | القيمة | ملاحظة |
 |---|---|---|
-| `DATABASE_URL` | رابط Postgres من الخطوة 1 | **مطلوب** |
+| `LIBSQL_URL` | `libsql://asba-asba.aws-sa-east-1.turso.io` | **مطلوب** |
+| `LIBSQL_AUTH_TOKEN` | توكن Turso (القراءة/الكتابة) | **مطلوب** |
 | `ADMIN_USERNAME` | اسم المستخدم للدخول | **مطلوب** |
 | `ADMIN_PASSWORD` | كلمة مرور قوية | **مطلوبة** — يمكنك تغييرها لاحقًا من اللوحة |
 | `SESSION_SECRET` | نص عشوائي طويل | اختياري (يُولَّد تلقائيًا) |
