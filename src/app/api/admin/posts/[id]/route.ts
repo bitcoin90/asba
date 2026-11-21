@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { query, one, update, nowISO } from "@/lib/db";
-import { sanitizePostPayload } from "../route";
+import { sanitizePostPayload } from "@/lib/post-payload";
 import type { PostRow } from "@/lib/types";
 
 type Ctx = { params: Promise<{ id: string }> };

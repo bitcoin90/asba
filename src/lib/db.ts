@@ -30,6 +30,14 @@ declare global {
 
 function getSqlite(): any {
   if (!globalThis.__asbaSqlite) {
+    // على منصات الاستضافة (مثل Vercel) نظام الملفات للقراءة فقط وبيئة SQLite المحلية غير صالحة:
+    // أعطِ خطأً واضحًا يشرح الحل بدل انهيار غامض
+    if (process.env.VERCEL) {
+      throw new Error(
+        "DATABASE NOT CONFIGURED: لم يتم ضبط متغيرات قاعدة البيانات في Vercel. " +
+          "أضف LIBSQL_URL و LIBSQL_AUTH_TOKEN في Project Settings → Environment Variables ثم أعد النشر."
+      );
+    }
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Database = require("better-sqlite3");
     // eslint-disable-next-line @typescript-eslint/no-var-requires
