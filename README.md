@@ -97,28 +97,34 @@ Vercel → Project → Settings → Domains → أضف نطاقك واتبع ت�
 - إحصائيات مجهولة الهوية بالكامل (عدّاد فقط — لا عناوين IP ولا ملفات تتبع).
 - نموذج التواصل محمي من السبام بحقل فخ مخفي.
 
-> ⚠️ **مهم:** إذا شاركت توكن GitHub في أي مكان عام (كالمحادثات)، أنشئ توكنًا جديدًا واحذف القديم من GitHub → Settings → Developer settings.
+> ⚠️ **مهم:** إذا شاركت توكن GitHub أو توكن Turso في أي مكان عام (كالمحادثات)، أنشئ توكنًا جديدًا واحذف القديم.
 
 ---
 
-## قاعدة البيانات — Neon (مربوطة فعليًا)
+## قاعدة البيانات — Turso (مربوطة فعليًا)
 
-المشروع مربوط بمشروع Neon **asba** (`wispy-dew-85377643`) على الفرع **production** عبر ملف `neon.ts` من `@neon/config`:
+المنصة تعمل على قاعدة **Turso (libSQL)** في ساوث أمريكا الشرقية، عبر سائق `@libsql/client`:
+
+- `LIBSQL_URL` = `libsql://asba-asba.aws-sa-east-1.turso.io` و`LIBSQL_AUTH_TOKEN` = توكن القراءة/الكتابة — كلاهما في `.env.local` (غير مرفوع على git).
+- البديل المدعوم: ضع الرابط في `DATABASE_URL` يبدأ بـ `libsql://` والتوكن في `DATABASE_AUTH_TOKEN` — التطبيق يتعرّف عليهما تلقائيًا.
+- الجداول تنشأ وتُبذر تلقائيًا عند أول طلب (8 جداول + مقال ترحيبي + 6 صفحات ثابتة + الإعدادات).
+- تدوير التوكن في أي وقت: `turso db tokens create asba` ثم حدّث `LIBSQL_AUTH_TOKEN`.
+
+**للنشر على Vercel:** ضع `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN` + `ADMIN_USERNAME` + `ADMIN_PASSWORD` في Environment Variables — لا حاجة لأي متغير آخر.
+
+### مهام Turso المفيدة
 
 ```bash
-# سحب متغيرات الاتصال إلى .env.local (DATABASE_URL + متغيرات الفرع)
-neon env pull
-
-# تطبيق سياسة الخدمات المعلنة في neon.ts (Postgres + Functions + Realtime)
-neon deploy
+turso db show asba                      # معلومات القاعدة
+turso db tokens create asba             # توكن جديد
+turso db shell asba "SELECT COUNT(*) FROM posts"
+turso db create asba-replica --location fra   # نسخة للقراءة قريبة من أوروبا
 ```
 
-- `DATABASE_URL` في `.env.local` هو رابط **pooled** من Neon — الأنسب لتطبيقات الويب وVercel (سائق `pg` كما توصي مهارة neon-postgres).
-- يستخدم التطبيق `attachDatabasePool` من `@vercel/functions` لإعلام منصة Vercel عن اتصالات Pool النشطة.
-- الدوال: `hello.ts` نُشرت على الفرع (`neon functions get hello`)، ويمكن تشغيلها محليًا بـ `neon dev` ثم استدعاؤها على `http://localhost:8787`.
-- للتطوير على فرع معزول: `neon checkout dev --create` — كل فرع يحصل على قاعدة ونسخة دوال مستقلة.
+### خيارات أخرى مدعومة في الكود
 
-**على Vercel:** نفس `DATABASE_URL` (pooled) + `ADMIN_USERNAME` + `ADMIN_PASSWORD` في Environment Variables — لا حاجة لأي متغير آخر.
+طبقة البيانات تدعم ثلاثة خلفيات بالترتيب: **Turso/libSQL** أولوية أولى، ثم **Postgres** (Neon وغيره عبر `DATABASE_URL` البادئة بـ `postgres://`)، ثم **SQLite محلي** في `data/` للتطوير — يكفي تغيير متغيرات البيئة للتبديل دون تعديل الكود.
+
 
 ---
 

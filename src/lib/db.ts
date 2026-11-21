@@ -1,13 +1,27 @@
-// طبقة الاتصال بقاعدة البيانات — تدعم Postgres على الإنتاج (Vercel + Neon) و SQLite للتطوير المحلي
+// طبقة الاتصال بقاعدة البيانات — تدعم Turso/libSQL على الإنتاج، وPostgres، وSQLite للتطوير المحلي
 import type { Row } from "./types";
 
+/** إعدادات Turso: LIBSQL_URL أو DATABASE_URL يبدأ بـ libsql:// — مع التوكن من LIBSQL_AUTH_TOKEN أو DATABASE_AUTH_TOKEN */
+export function libsqlConfig(): { url: string; authToken: string } | null {
+  const url = process.env.LIBSQL_URL || (/^libsql:/.test(process.env.DATABASE_URL || "") ? (process.env.DATABASE_URL as string) : "");
+  if (!url) return null;
+  const authToken = process.env.LIBSQL_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN || "";
+  return { url, authToken };
+}
+
+export function hasLibsql(): boolean {
+  return !!libsqlConfig();
+}
+
 export function hasPostgres(): boolean {
-  return !!process.env.DATABASE_URL;
+  return !hasLibsql() && /^postgres(ql)?:/.test(process.env.DATABASE_URL || "");
 }
 
 declare global {
   // eslint-disable-next-line no-var
   var __asbaPool: any;
+  // eslint-disable-next-line no-var
+  var __asbaLibsql: any;
   // eslint-disable-next-line no-var
   var __asbaSchema: Promise<void> | undefined;
   // eslint-disable-next-line no-var
@@ -29,6 +43,15 @@ function getSqlite(): any {
     globalThis.__asbaSqlite = db;
   }
   return globalThis.__asbaSqlite;
+}
+
+/** عميل Turso/libSQL — عمولة واحدة معاد استخدامها عبر عمر العملية */
+async function getLibsql(): Promise<any> {
+  if (!globalThis.__asbaLibsql) {
+    const { createClient } = await import("@libsql/client");
+    globalThis.__asbaLibsql = createClient(libsqlConfig() as any);
+  }
+  return globalThis.__asbaLibsql;
 }
 
 async function getPool(): Promise<any> {
@@ -57,6 +80,11 @@ export async function query<T = Row>(sql: string, params: any[] = []): Promise<T
 /** المنفّذ الخام — يضمن وجود الجداول فقط (يستخدمه البذر نفسه لتجنّب الاعتماد الدائري) */
 export async function q<T = Row>(sql: string, params: any[] = []): Promise<T[]> {
   await ensureDDL();
+  if (hasLibsql()) {
+    const db = await getLibsql();
+    const res = await db.execute({ sql, args: params });
+    return (res.rows ?? []) as T[];
+  }
   if (hasPostgres()) {
     let i = 0;
     const converted = sql.replace(/\?/g, () => `$${++i}`);
@@ -252,7 +280,14 @@ CREATE TABLE IF NOT EXISTS messages (
 export function ensureDDL(): Promise<void> {
   if (!globalThis.__asbaSchema) {
     globalThis.__asbaSchema = (async () => {
-      if (hasPostgres()) {
+      if (hasLibsql()) {
+        const db = await getLibsql();
+        const stmts = SQLITE_SCHEMA.split(";")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .map((sql) => ({ sql, args: [] }));
+        await db.batch(stmts, "write");
+      } else if (hasPostgres()) {
         const pool = await getPool();
         await pool.query(PG_SCHEMA);
       } else {

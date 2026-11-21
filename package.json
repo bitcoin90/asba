@@ -9,8 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@neon/config": "^1.14.6",
-    "@neon/env": "^2.1.9",
+    "@libsql/client": "^0.18.0",
     "@vercel/functions": "^3.11.3",
     "next": "^15.5.0",
     "pg": "^8.16.0",
