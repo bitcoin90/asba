@@ -109,7 +109,7 @@ export async function recordView(path: string, slug?: string): Promise<void> {
   const day = new Date().toISOString().slice(0, 10);
   await query(
     `INSERT INTO views (stat_key, day, count) VALUES (?, ?, 1)
-     ON CONFLICT (stat_key, day) DO UPDATE SET count = count + 1`,
+     ON CONFLICT (stat_key, day) DO UPDATE SET count = views.count + 1`,
     [path, day]
   );
   if (slug) {

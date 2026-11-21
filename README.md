@@ -101,6 +101,27 @@ Vercel → Project → Settings → Domains → أضف نطاقك واتبع ت�
 
 ---
 
+## قاعدة البيانات — Neon (مربوطة فعليًا)
+
+المشروع مربوط بمشروع Neon **asba** (`wispy-dew-85377643`) على الفرع **production** عبر ملف `neon.ts` من `@neon/config`:
+
+```bash
+# سحب متغيرات الاتصال إلى .env.local (DATABASE_URL + متغيرات الفرع)
+neon env pull
+
+# تطبيق سياسة الخدمات المعلنة في neon.ts (Postgres + Functions + Realtime)
+neon deploy
+```
+
+- `DATABASE_URL` في `.env.local` هو رابط **pooled** من Neon — الأنسب لتطبيقات الويب وVercel (سائق `pg` كما توصي مهارة neon-postgres).
+- يستخدم التطبيق `attachDatabasePool` من `@vercel/functions` لإعلام منصة Vercel عن اتصالات Pool النشطة.
+- الدوال: `hello.ts` نُشرت على الفرع (`neon functions get hello`)، ويمكن تشغيلها محليًا بـ `neon dev` ثم استدعاؤها على `http://localhost:8787`.
+- للتطوير على فرع معزول: `neon checkout dev --create` — كل فرع يحصل على قاعدة ونسخة دوال مستقلة.
+
+**على Vercel:** نفس `DATABASE_URL` (pooled) + `ADMIN_USERNAME` + `ADMIN_PASSWORD` في Environment Variables — لا حاجة لأي متغير آخر.
+
+---
+
 ## بنية المشروع
 
 ```

@@ -38,7 +38,13 @@ async function getPool(): Promise<any> {
     const ssl = /localhost|127\.0\.0\.1|sslmode=disable/.test(url)
       ? undefined
       : { rejectUnauthorized: false };
-    globalThis.__asbaPool = new Pool({ connectionString: url, max: 3, ssl });
+    const pool = new Pool({ connectionString: url, max: 3, ssl });
+    // على Vercel: أبلغ المنصة عن اتصالات Pool النشطة لتوزيع الاستدعاءات المتزامنة بأمان
+    try {
+      const { attachDatabasePool } = await import("@vercel/functions");
+      attachDatabasePool(pool);
+    } catch {}
+    globalThis.__asbaPool = pool;
   }
   return globalThis.__asbaPool;
 }
