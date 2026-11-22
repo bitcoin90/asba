@@ -5,6 +5,7 @@ import AdSlot from "@/components/public/AdSlot";
 import Reveal from "@/components/public/Reveal";
 import { listVisiblePosts, listCategories, getAdsMap } from "@/lib/queries";
 import { getSettings } from "@/lib/settings";
+import { METADATA_BASE } from "@/lib/site";
 import { fmtNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -28,8 +29,35 @@ export default async function HomePage() {
     listCategories(),
   ]);
 
+  // GEO — بيانات منظمة للرئيسية: WebSite + Organization لفهم النماذج ومحركات البحث
+  const base = await METADATA_BASE();
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: settings.site_name,
+      url: `${base}/`,
+      description: settings.site_description,
+      inLanguage: "ar",
+      publisher: { "@type": "Organization", name: settings.site_name },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${base}/search?q={search_term_string}` },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: settings.site_name,
+      url: `${base}/`,
+      description: settings.about_short,
+    },
+  ];
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* قسم الترحيب */}
       <section className="hero-mesh relative overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-20 sm:pt-28">

@@ -57,6 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: [og],
       type: "article",
       publishedTime: post.published_at || post.created_at,
+      modifiedTime: post.updated_at,
       siteName: s.site_name,
     },
     twitter: { card: "summary_large_image", title: post.title, description: post.excerpt, images: [og] },
@@ -106,18 +107,45 @@ export default async function PostPage({ params, searchParams }: Props) {
   const content = middleAd ? injectMiddleAd(post.content, middleAd) : post.content;
 
   const base = await baseUrl();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.seo_description || post.excerpt,
-    image: cover ? (cover.startsWith("http") ? cover : `${base}${cover}`) : `${base}/og-default.png`,
-    datePublished: post.published_at || post.created_at,
-    dateModified: post.updated_at,
-    author: { "@type": "Person", name: settings.author_name },
-    publisher: { "@type": "Organization", name: settings.site_name },
-    mainEntityOfPage: `${base}/post/${encodeURIComponent(post.slug)}`,
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.seo_description || post.excerpt,
+      image: cover ? (cover.startsWith("http") ? cover : `${base}${cover}`) : `${base}/og-default.png`,
+      datePublished: post.published_at || post.created_at,
+      dateModified: post.updated_at,
+      author: { "@type": "Person", name: settings.author_name },
+      publisher: { "@type": "Organization", name: settings.site_name },
+      keywords: tags.join(", "),
+      mainEntityOfPage: `${base}/post/${encodeURIComponent(post.slug)}`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "الرئيسية", item: `${base}/` },
+        { "@type": "ListItem", position: 2, name: "المقالات", item: `${base}/posts` },
+        ...(post.category_slug
+          ? [
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: post.category_name,
+                item: `${base}/category/${encodeURIComponent(post.category_slug)}`,
+              },
+            ]
+          : []),
+        {
+          "@type": "ListItem",
+          position: post.category_slug ? 4 : 3,
+          name: post.title,
+          item: `${base}/post/${encodeURIComponent(post.slug)}`,
+        },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -160,7 +188,7 @@ export default async function PostPage({ params, searchParams }: Props) {
                 </span>
                 <span className="font-semibold text-zinc-700 dark:text-zinc-300">{settings.author_name}</span>
               </span>
-              <span>{fmtDate(post.published_at || post.created_at)}</span>
+              <time dateTime={post.published_at || post.created_at}>{fmtDate(post.published_at || post.created_at)}</time>
               <span>{minutes} دقائق قراءة</span>
               <span className="flex items-center gap-1">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
