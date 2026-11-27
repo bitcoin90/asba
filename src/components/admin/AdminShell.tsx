@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/pages", label: "الصفحات الثابتة", icon: "M6 3h9l4 4v14H6zM15 3v4h4" },
   { href: "/admin/media", label: "مكتبة الوسائط", icon: "M3 5h18v14H3zM3 15l5-5 4 4 3-3 6 6" },
   { href: "/admin/ads", label: "الإعلانات", icon: "M3 12h4l6-5v10l-6-5H3zM17 8a6 6 0 0 1 0 8" },
+  { href: "/admin/short-links", label: "تقصير الروابط", icon: "M10 14a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 10a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" },
   { href: "/admin/messages", label: "الرسائل", icon: "M3 6h18v12H3zM3 7l9 6 9-6" },
   { href: "/admin/settings", label: "الإعدادات", icon: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM3 12h2m14 0h2M12 3v2m0 14v2M5.6 5.6l1.4 1.4m10 10 1.4 1.4M5.6 18.4 7 17m10-10 1.4-1.4" },
   { href: "/admin/password", label: "كلمة المرور", icon: "M6 10V8a6 6 0 0 1 12 0v2M4 10h16v10H4zM12 14v3" },
