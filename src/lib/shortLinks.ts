@@ -47,7 +47,10 @@ export async function getShortLinkByCode(code: string): Promise<ShortLinkRow | n
   return one<ShortLinkRow>(`SELECT ${COLS} FROM short_links WHERE code = ?`, [code]);
 }
 
-export async function codeExists(code: string): Promise<boolean> {
+export async function codeExists(code: string, excludeId?: number): Promise<boolean> {
+  if (excludeId) {
+    return !!(await one<{ id: number }>("SELECT id FROM short_links WHERE code = ? AND id != ?", [code, excludeId]));
+  }
   return !!(await one<{ id: number }>("SELECT id FROM short_links WHERE code = ?", [code]));
 }
 

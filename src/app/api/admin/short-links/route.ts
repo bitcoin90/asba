@@ -20,7 +20,8 @@ interface Body {
 }
 
 // يتحقق من الحقول المشتركة بين الإنشاء والتعديل ويعيد رسالة خطأ أو null
-async function validate(body: Body): Promise<{ code: string; url: string; title: string; error?: string }> {
+// excludeId يُستثني من فحص تكرار الكود عند التعديل (السجل نفسه)
+async function validate(body: Body, excludeId?: number): Promise<{ code: string; url: string; title: string; error?: string }> {
   const url = String(body.url || "").trim();
   const code = String(body.code || "").trim();
   const title = String(body.title || "").trim().slice(0, 200);
@@ -42,7 +43,7 @@ async function validate(body: Body): Promise<{ code: string; url: string; title:
 
   if (!isValidCode(code))
     return { code, url, title, error: "الكود غير صالح — استخدم 3-30 حرفًا لاتينيًا أو رقمًا أو شرطة بدون مسافات" };
-  if (await codeExists(code)) return { code, url, title, error: `الكود «${code}» مستخدم بالفعل — اختر كودًا آخر` };
+  if (await codeExists(code, excludeId)) return { code, url, title, error: `الكود «${code}» مستخدم بالفعل — اختر كودًا آخر` };
 
   return { code, url, title };
 }
@@ -79,7 +80,7 @@ export async function PUT(req: NextRequest) {
     const body = (await req.json()) as Body;
     const id = Number(body.id || 0);
     if (!id) return NextResponse.json({ error: "معرف الرابط مطلوب" }, { status: 400 });
-    const v = await validate(body);
+    const v = await validate(body, id);
     if (v.error) return NextResponse.json({ error: v.error }, { status: 400 });
     await updateShortLink(id, v.code, v.url, v.title);
     return NextResponse.json({ ok: true, code: v.code });
